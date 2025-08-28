@@ -1,0 +1,73 @@
+*{
+    margin: 0px;
+    padding: 0%;
+    text-align: center;
+
+}
+.heading{
+    background-color: olivedrab;
+    color: white;
+    height: 5rem;
+    line-height: 5rem;  /*uper se spacing ke liye*/
+   
+}
+.choice:hover
+{
+    opacity: 0.5;
+    cursor: pointer;
+}
+.choices
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    margin-top: 80px;
+}
+.choice
+{
+    height: 165px;
+    width:165px ;
+    display: flex;
+}
+
+img{
+    height: 150px;
+    width:150px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.score-board
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4rem;
+    gap: 5rem;
+    font-size: 2rem;
+}
+
+.msg-container
+{
+    margin-top: 3rem;
+}
+#msg
+{
+    
+    margin-top: 3rem;
+    font-size: 2rem;
+    background-color: green;
+    color: aliceblue;
+    display: inline;
+    padding: 1rem;
+    border-radius: 1rem;
+
+}
+#user-score
+{
+    font-size: 4rem;
+}
+#comp-score
+{
+    font-size: 4rem;
+}
