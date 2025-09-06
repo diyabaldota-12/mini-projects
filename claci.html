@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 flex justify-center items-center">
+    <div id="calci" class="w-[350px] p-6 flex flex-col items-center bg-blue-300 rounded-2xl shadow-lg">
+            <div class="flex flex-col justify-centre">
+                    <input id="display" type="text" readonly 
+           class="bg-white border border-black h-12 w-full mb-4 text-right px-3 rounded">
+                    <div class="p-4">
+                        
+                        <div id="1r" class="flex">
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex  justify-centre items-center rounded p-4 hover:bg-pink-100 shadow-lg" onclick="
+                                currentdis='';
+                                document.querySelector('#display').value=currentdis;">C</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4  rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '1';
+                            document.querySelector('#display').value=currentdis">1</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4  rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '2';
+                            document.querySelector('#display').value=currentdis">2</button>
+                        </div><div id="1r" class="flex">
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex  justify-centre items-center p-4 rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '+';
+                            document.querySelector('#display').value=currentdis">+</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4 rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '3';
+                            document.querySelector('#display').value=currentdis">3</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4 rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '4';
+                            document.querySelector('#display').value=currentdis">4</button>
+                        </div>
+                        <div id="1r" class="flex">
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex  justify-centre items-center p-4  rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '-';
+                            document.querySelector('#display').value=currentdis">-</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4  rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '5';
+                            document.querySelector('#display').value=currentdis">5</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4 rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '6';
+                            document.querySelector('#display').value=currentdis">6</button>
+                        </div>
+                        <div id="1r" class="flex">
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex  justify-centre items-center p-4  rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '*';
+                            document.querySelector('#display').value=currentdis">*</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4  rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '7';
+                            document.querySelector('#display').value=currentdis">7</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4  rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '8';
+                            document.querySelector('#display').value=currentdis">8</button>
+                        </div>
+                        <div id="1r" class="flex">
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex  justify-centre items-center p-4  rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '/';
+                            document.querySelector('#display').value=currentdis">/</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4 rounded p-4 hover:bg-pink-100 shadow-lg" onclick="
+                            currentdis=eval(currentdis);
+                            document.querySelector('#display').value=currentdis">=</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4 rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '9';
+                            document.querySelector('#display').value=currentdis">9</button>
+                        </div>
+                        <div id="1r" class="flex justify-centre items-center ml-6">
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex  justify-centre items-center p-4 rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '0';
+                            document.querySelector('#display').value=currentdis">0</button>
+                            <button class=" bg-white h-10 w-10 m-2 border border-black flex justify-centre items-center p-4 rounded p-4 hover:bg-pink-100 shadow-lg" onclick="currentdis= currentdis+ '.';
+                            document.querySelector('#display').value=currentdis">.</button>
+                        </div>
+                    </div>
+
+            </div>
+
+    </div>
+
+    <script>
+        let currentdis='';
+        document.querySelector('#display').value=currentdis
+    </script>
+    
+</body>
+</html>
