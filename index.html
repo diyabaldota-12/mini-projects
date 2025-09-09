@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Color Picker App (Blue Theme)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Magnifier */
+    #magnifier {
+      position: absolute;
+      pointer-events: none;
+      border: 2px solid #2563eb;
+      border-radius: 10px;
+      width: 120px;
+      height: 120px;
+      overflow: hidden;
+      display: none;
+      background: #fff;
+      z-index: 40;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #magnifier canvas {
+      transform:scale(4);
+      transform-origin: top left;
+    }
+    /* Cursor pill */
+    #cursorColor {
+      position: absolute;
+      pointer-events: none;
+      display: none;
+      z-index: 50;
+      background: rgba(255,255,255,.95);
+      border: 1px solid #bfdbfe;
+      border-radius: 9999px;
+      padding: 6px 10px;
+      font-family: ui-monospace, monospace;
+      box-shadow: 0 4px 12px rgba(30,58,138,.15);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 flex justify-center items-center p-8">
+
+  <div class="bg-white/80 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden flex max-w-5xl w-full border border-blue-200">
+
+    <!-- LEFT -->
+    <div id="leftPane" class="w-2/3 p-6 flex flex-col items-center bg-blue-50 relative">
+      <input id="imgInput" type="file" accept="image/*"
+        class="mb-4 text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 
+               file:rounded-full file:border-0 file:text-sm file:font-semibold
+               file:bg-blue-200 file:text-blue-900 hover:file:bg-blue-300"/>
+
+      <canvas id="canvas" class="rounded-xl shadow-md max-w-full border border-blue-200 cursor-crosshair"></canvas>
+
+      <!-- Cursor pill -->
+      <div id="cursorColor" class="flex items-center gap-2">
+        <span id="cursorSwatch" class="inline-block w-4 h-4 rounded border border-gray-200"></span>
+        <span id="cursorHex" class="text-xs font-semibold text-gray-800">#------</span>
+      </div>
+
+      <!-- Magnifier -->
+      <div id="magnifier"><canvas id="magnifierCanvas"></canvas></div>
+
+      <!-- Palette -->
+      <div class="mt-4 w-full">
+        <h3 class="text-sm font-semibold text-blue-700 mb-2">PALETTE</h3>
+        <div id="colorList" class="flex gap-2 flex-wrap"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="w-1/3 bg-gradient-to-b from-blue-100 via-blue-50 to-blue-100 border-l border-blue-200 p-6 flex flex-col">
+      <h2 class="text-lg font-bold text-blue-900 mb-4">🎨 Picked Colors</h2>
+
+      <div id="colorInfo" class="space-y-4 hidden">
+        <div class="flex items-center justify-between p-3 bg-white/90 rounded-lg shadow border border-blue-200">
+          <div class="flex items-center gap-3">
+            <div id="colorPreview" class="w-8 h-8 rounded-md border shadow"></div>
+            <span id="hex" class="font-mono font-semibold text-gray-800"></span>
+          </div>
+          <button id="copyHex" class="text-gray-500 hover:text-blue-600" title="Copy HEX">
+            <i data-lucide="copy" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between p-3 bg-white/90 rounded-lg shadow border border-blue-200">
+          <span id="rgb" class="font-mono text-gray-700"></span>
+          <button id="copyRgb" class="text-gray-500 hover:text-blue-600" title="Copy RGB">
+            <i data-lucide="copy" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <button id="saveBtn"
+          class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+          Save to Palette
+        </button>
+      </div>
+
+      <button id="clearBtn"
+        class="mt-auto px-4 py-2 bg-blue-400 text-white rounded-lg shadow hover:bg-blue-500 transition hidden">
+        Clear Palette
+      </button>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // DOM
+    const imgInput = document.getElementById("imgInput");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const leftPane = document.getElementById("leftPane");
+
+    const hexText = document.getElementById("hex");
+    const rgbText = document.getElementById("rgb");
+    const colorPreview = document.getElementById("colorPreview");
+    const saveBtn = document.getElementById("saveBtn");
+    const colorInfo = document.getElementById("colorInfo");
+    const colorList = document.getElementById("colorList");
+    const clearBtn = document.getElementById("clearBtn");
+    const copyHexBtn = document.getElementById("copyHex");
+    const copyRgbBtn = document.getElementById("copyRgb");
+
+    const magnifier = document.getElementById("magnifier");
+    const magnifierCanvas = document.getElementById("magnifierCanvas");
+    const mctx = magnifierCanvas.getContext("2d");
+
+    const cursorColor = document.getElementById("cursorColor");
+    const cursorSwatch = document.getElementById("cursorSwatch");
+    const cursorHex = document.getElementById("cursorHex");
+
+    let savedColors = [];
+    let currentHoverColor = null;
+    let currentColor = null;
+
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join("").toUpperCase();
+    }
+    function getCanvasCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: Math.floor((e.clientX - rect.left) * scaleX),
+        y: Math.floor((e.clientY - rect.top) * scaleY),
+        rect
+      };
+    }
+
+    imgInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    // Hover: show pill + magnifier only
+    canvas.addEventListener("mousemove", (e) => {
+      if (!canvas.width) return;
+      const { x, y, rect } = getCanvasCoords(e);
+      const data = ctx.getImageData(x, y, 1, 1).data;
+      const hex = rgbToHex(data[0], data[1], data[2]);
+      currentHoverColor = { hex, rgb:`rgb(${data[0]},${data[1]},${data[2]})` };
+
+      cursorSwatch.style.background = hex;
+      cursorHex.textContent = hex;
+      cursorColor.style.left = (e.clientX - leftPane.getBoundingClientRect().left + 16)+"px";
+      cursorColor.style.top = (e.clientY - leftPane.getBoundingClientRect().top + 16)+"px";
+      cursorColor.style.display = "flex";
+
+      // Magnifier
+      const size = 30;
+      magnifierCanvas.width = size;
+      magnifierCanvas.height = size;
+      mctx.imageSmoothingEnabled = false;
+      mctx.drawImage(canvas, x - size/2, y - size/2, size, size, 0, 0, size, size);
+      magnifier.style.left = (e.clientX - leftPane.getBoundingClientRect().left + 20)+"px";
+      magnifier.style.top = (e.clientY - leftPane.getBoundingClientRect().top - 140)+"px";
+      magnifier.style.display = "block";
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      cursorColor.style.display = "none";
+      magnifier.style.display = "none";
+    });
+
+    // Click: lock color into right panel
+    canvas.addEventListener("click", () => {
+      if (!currentHoverColor) return;
+      currentColor = {...currentHoverColor};
+      colorInfo.classList.remove("hidden");
+      hexText.textContent = currentColor.hex;
+      rgbText.textContent = currentColor.rgb;
+      colorPreview.style.background = currentColor.hex;
+    });
+
+    function copyToClipboard(text, btn) {
+      navigator.clipboard.writeText(text);
+      btn.classList.add("text-green-600");
+      setTimeout(()=>btn.classList.remove("text-green-600"),800);
+    }
+    copyHexBtn.addEventListener("click", ()=>{ if(currentColor) copyToClipboard(currentColor.hex, copyHexBtn); });
+    copyRgbBtn.addEventListener("click", ()=>{ if(currentColor) copyToClipboard(currentColor.rgb, copyRgbBtn); });
+
+    saveBtn.addEventListener("click", () => {
+      if (!currentColor) return;
+      savedColors.push(currentColor);
+      renderPalette();
+    });
+    function renderPalette() {
+      colorList.innerHTML="";
+      savedColors.forEach(c=>{
+        const chip=document.createElement("div");
+        chip.className="w-12 h-12 rounded-md shadow border cursor-pointer hover:scale-105 transition";
+        chip.style.background=c.hex;
+        chip.title=`${c.hex} | ${c.rgb}`;
+        colorList.appendChild(chip);
+      });
+      clearBtn.classList.toggle("hidden", savedColors.length===0);
+    }
+    clearBtn.addEventListener("click",()=>{savedColors=[];renderPalette();});
+  </script>
+</body>
+</html>

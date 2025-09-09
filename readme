@@ -1,0 +1,9 @@
+bg-gradient-to-br - defines a linear background gradient that starts from the top-left corner of an element and transitions to the bottom-right corner
+
+
+ input id="imgInput" type="file" accept="image/*"  takes image as an input file
+
+ 
+ <canvas> is an HTML element that gives you a drawing area on the page.
+By itself, it’s just a blank rectangle.
+With JavaScript, you can draw images, shapes, or even read pixel data (which is how we get the color under your mouse).
